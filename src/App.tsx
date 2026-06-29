@@ -10,6 +10,7 @@ import { Roadmap } from './components/Roadmap';
 import { TechStack } from './components/TechStack';
 import { CodeExamples } from './components/CodeExamples';
 import { ProposedFeatures } from './components/ProposedFeatures';
+import { ContractPanel } from './components/ContractPanel';
 import { ExternalLink, Heart } from 'lucide-react';
 import { useWallet } from './hooks/useWallet';
 
@@ -39,6 +40,8 @@ function App() {
         return <CodeExamples />;
       case 'features':
         return <ProposedFeatures />;
+      case 'contract':
+        return <ContractPanel />;
       default:
         return <PredictionDemo />;
     }

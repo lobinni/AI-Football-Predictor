@@ -13,6 +13,7 @@ export function Header({ activeTab, setActiveTab }: HeaderProps) {
 
   const tabs = [
     { id: 'demo', label: 'Predictions', icon: '⚽' },
+    { id: 'contract', label: 'Contract', icon: '📜' },
     { id: 'news', label: 'News', icon: '📰' },
     { id: 'history', label: 'History', icon: '📊' },
     { id: 'leaderboard', label: 'Leaderboard', icon: '🏆' },
