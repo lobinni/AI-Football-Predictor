@@ -1,21 +1,14 @@
 // ══════════════════════════════════════════════════════════════════════════════
 // DEPLOYED CONTRACT CONFIGURATION
 // ══════════════════════════════════════════════════════════════════════════════
+//
+// Contract: FootballPredictor
+// Network: GenLayer Testnet Bradbury
+// Deployed: Successfully ✅
+//
+// ══════════════════════════════════════════════════════════════════════════════
 
-/**
- * FootballPredictor Intelligent Contract - DEPLOYED on GenLayer Testnet Bradbury
- * 
- * Contract Address: 0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D
- * Network: GenLayer Testnet Bradbury (Chain ID: dynamically fetched)
- * Explorer: https://explorer-bradbury.genlayer.com/contract/0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D
- * 
- * This contract uses GenLayer's Intelligent Contract features:
- * - gl.get_webpage() for fetching live football data
- * - gl.exec_prompt() for AI-powered match analysis
- * - gl.eq_principle_strict_eq() for validator consensus
- */
-
-export const CONTRACT_ADDRESS = '0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D';
+export const CONTRACT_ADDRESS = '0x10BaD21722eA75a7CF67eF6fD3B6501fc92AF669';
 
 export const GENLAYER_CONFIG = {
   chainName: 'GenLayer Testnet Bradbury',
@@ -29,8 +22,8 @@ export const GENLAYER_CONFIG = {
   },
 };
 
-export const getContractExplorerUrl = () => 
-  `${GENLAYER_CONFIG.explorerUrl}/contract/${CONTRACT_ADDRESS}`;
+export const getContractExplorerUrl = () =>
+  `${GENLAYER_CONFIG.explorerUrl}/address/${CONTRACT_ADDRESS}`;
 
 export const getTransactionExplorerUrl = (txHash: string) =>
   `${GENLAYER_CONFIG.explorerUrl}/tx/${txHash}`;

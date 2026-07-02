@@ -14,8 +14,16 @@ export interface PredictionResult {
   draw_prob: number;
   away_win_prob: number;
   predicted_score: string;
-  confidence: number;
+  confidence: string;
   analysis: string;
+}
+
+export interface PredictionRecord extends PredictionResult {
+  id: string;
+  submitter: string;
+  home_team: string;
+  away_team: string;
+  match_date: string;
 }
 
 export function useGenLayer() {
@@ -66,7 +74,6 @@ export function useGenLayer() {
     setError(null);
 
     try {
-      // Write transaction to the deployed Intelligent Contract
       const txHash = await client.writeContract({
         address: CONTRACT_ADDRESS as `0x${string}`,
         functionName: 'predict_match',
@@ -76,7 +83,6 @@ export function useGenLayer() {
 
       setState(prev => ({ ...prev, lastTxHash: txHash }));
 
-      // Wait for consensus (AI analysis by validators)
       const receipt: any = await client.waitForTransactionReceipt({
         hash: txHash as any,
         status: 'ACCEPTED' as any,
@@ -86,21 +92,18 @@ export function useGenLayer() {
 
       setState(prev => ({ ...prev, lastReceipt: receipt }));
 
-      // Parse prediction result
-      let prediction: PredictionResult | null = null;
-      try {
-        const resultData = receipt?.data?.result || receipt?.result;
-        if (typeof resultData === 'string') {
-          prediction = JSON.parse(resultData);
-        } else if (resultData) {
-          prediction = resultData;
-        }
-      } catch {
-        console.warn('Could not parse prediction from receipt');
+      // The contract returns prediction_id (key), we need to fetch the prediction
+      const predictionId = receipt?.data?.result || receipt?.result;
+      
+      if (predictionId !== undefined) {
+        // Fetch the actual prediction data
+        const prediction = await readPrediction(String(predictionId));
+        setLoading(false);
+        return prediction;
       }
 
       setLoading(false);
-      return prediction;
+      return null;
     } catch (e: any) {
       console.error('Predict error:', e);
       setError(e.message);
@@ -110,17 +113,21 @@ export function useGenLayer() {
   }, []);
 
   // Read prediction from contract (view — free, no gas)
-  const readPrediction = useCallback(async (predictionId: string) => {
+  const readPrediction = useCallback(async (predictionId: string): Promise<PredictionResult | null> => {
     const client = clientRef.current;
     if (!client) return null;
 
     try {
-      const result = await client.readContract({
+      const result: any = await client.readContract({
         address: CONTRACT_ADDRESS as `0x${string}`,
         functionName: 'get_prediction',
         args: [predictionId],
       });
-      return typeof result === 'string' ? JSON.parse(result) : result;
+      
+      if (result && result.exists !== false) {
+        return result as PredictionResult;
+      }
+      return null;
     } catch (e: any) {
       console.error('Read error:', e);
       return null;
@@ -133,19 +140,36 @@ export function useGenLayer() {
     if (!client) return 0;
 
     try {
-      const result = await client.readContract({
+      const result: any = await client.readContract({
         address: CONTRACT_ADDRESS as `0x${string}`,
-        functionName: 'get_prediction_count',
+        functionName: 'get_count',
         args: [],
       });
-      return Number(result);
+      return result?.total || 0;
     } catch {
       return 0;
     }
   }, []);
 
+  // Get all predictions
+  const getAllPredictions = useCallback(async (): Promise<PredictionRecord[]> => {
+    const client = clientRef.current;
+    if (!client) return [];
+
+    try {
+      const result = await client.readContract({
+        address: CONTRACT_ADDRESS as `0x${string}`,
+        functionName: 'get_all_predictions',
+        args: [],
+      });
+      return (result as unknown as PredictionRecord[]) || [];
+    } catch {
+      return [];
+    }
+  }, []);
+
   // Get user's predictions
-  const getUserPredictions = useCallback(async (userAddress: string): Promise<string[]> => {
+  const getUserPredictions = useCallback(async (userAddress: string): Promise<PredictionRecord[]> => {
     const client = clientRef.current;
     if (!client) return [];
 
@@ -155,10 +179,7 @@ export function useGenLayer() {
         functionName: 'get_user_predictions',
         args: [userAddress],
       });
-      if (typeof result === 'string' && result) {
-        return result.split(',');
-      }
-      return [];
+      return (result as unknown as PredictionRecord[]) || [];
     } catch {
       return [];
     }
@@ -174,6 +195,7 @@ export function useGenLayer() {
     predictMatch,
     readPrediction,
     getPredictionCount,
+    getAllPredictions,
     getUserPredictions,
   };
 }
