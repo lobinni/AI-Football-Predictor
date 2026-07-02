@@ -1,131 +1,108 @@
-import { Activity, Menu, X } from 'lucide-react';
-import { useState } from 'react';
-import { WalletConnect } from './WalletConnect';
-import { NotificationCenter } from './NotificationCenter';
+import { Wallet, ExternalLink, RefreshCw, Droplets } from 'lucide-react';
+import { GENLAYER_CONFIG, getContractExplorerUrl } from '../config/contract';
 
 interface HeaderProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
+  isConnected: boolean;
+  address: string | null;
+  balance: string;
+  isGenLayer: boolean;
+  isConnecting: boolean;
+  onConnect: () => void;
+  onDisconnect: () => void;
+  onRefreshBalance: () => void;
 }
 
-export function Header({ activeTab, setActiveTab }: HeaderProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const tabs = [
-    { id: 'demo', label: 'Predictions', icon: '⚽' },
-    { id: 'contract', label: 'Contract', icon: '📜' },
-    { id: 'news', label: 'News', icon: '📰' },
-    { id: 'history', label: 'History', icon: '📊' },
-    { id: 'leaderboard', label: 'Leaderboard', icon: '🏆' },
-    { id: 'achievements', label: 'Achievements', icon: '🎖️' },
-    { id: 'feasibility', label: 'Feasibility', icon: '📋' },
-    { id: 'roadmap', label: 'Roadmap', icon: '🗺️' },
-    { id: 'tech', label: 'Tech', icon: '🛠️' },
-    { id: 'code', label: 'Code', icon: '💻' },
-    { id: 'features', label: 'Features', icon: '✨' },
-  ];
+export function Header({
+  isConnected,
+  address,
+  balance,
+  isGenLayer,
+  isConnecting,
+  onConnect,
+  onDisconnect,
+  onRefreshBalance,
+}: HeaderProps) {
+  const shortAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : '';
 
   return (
-    <header className="bg-gradient-to-r from-emerald-600 to-blue-600 text-white shadow-lg sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <header className="bg-gradient-to-r from-green-900 via-emerald-900 to-teal-900 border-b border-green-700/50 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="bg-white/20 p-2 rounded-lg">
-              <Activity className="w-6 h-6" />
-            </div>
+            <span className="text-4xl">⚽</span>
             <div>
-              <h1 className="text-xl font-bold">FootballAI</h1>
-              <p className="text-xs text-emerald-100">Powered by GenLayer</p>
+              <h1 className="text-2xl font-bold text-white">FootballAI</h1>
+              <p className="text-xs text-green-300">Powered by GenLayer Intelligent Contracts</p>
             </div>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden xl:flex items-center gap-1">
-            {tabs.slice(0, 6).map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1 ${
-                  activeTab === tab.id
-                    ? 'bg-white/20 text-white'
-                    : 'text-emerald-100 hover:bg-white/10'
-                }`}
-              >
-                <span>{tab.icon}</span>
-                <span>{tab.label}</span>
-              </button>
-            ))}
-            
-            {/* More dropdown for additional tabs */}
-            <div className="relative group">
-              <button className="px-3 py-2 rounded-lg text-sm font-medium text-emerald-100 hover:bg-white/10 flex items-center gap-1">
-                <span>📁</span>
-                <span>More</span>
-              </button>
-              <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                {tabs.slice(6).map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`w-full px-4 py-2 text-left text-sm flex items-center gap-2 hover:bg-gray-100 first:rounded-t-lg last:rounded-b-lg ${
-                      activeTab === tab.id ? 'bg-emerald-50 text-emerald-700' : 'text-gray-700'
-                    }`}
-                  >
-                    <span>{tab.icon}</span>
-                    <span>{tab.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </nav>
-
-          {/* Right Side - Notifications & Wallet */}
+          {/* Contract Info */}
           <div className="hidden md:flex items-center gap-2">
-            <NotificationCenter />
-            <WalletConnect />
+            <a
+              href={getContractExplorerUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-1.5 bg-green-800/50 rounded-lg text-sm text-green-200 hover:bg-green-800 transition-colors"
+            >
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              Contract Live
+              <ExternalLink className="w-3 h-3" />
+            </a>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="xl:hidden p-2 rounded-lg hover:bg-white/10"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
+          {/* Wallet */}
+          <div className="flex items-center gap-3">
+            {isConnected ? (
+              <>
+                {/* Balance */}
+                <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-black/30 rounded-lg">
+                  <span className="text-green-400 font-mono">{balance} GEN</span>
+                  <button
+                    onClick={onRefreshBalance}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                  </button>
+                </div>
 
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <div className="xl:hidden pb-4 space-y-4">
-            {/* Mobile Wallet & Notifications */}
-            <div className="pb-4 border-b border-white/20 flex items-center gap-2">
-              <NotificationCenter />
-              <WalletConnect />
-            </div>
-            
-            {/* Mobile Nav Links */}
-            <nav className="grid grid-cols-3 gap-2">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => {
-                    setActiveTab(tab.id);
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`p-3 rounded-lg text-sm font-medium transition-all flex flex-col items-center gap-1 ${
-                    activeTab === tab.id
-                      ? 'bg-white/20 text-white'
-                      : 'text-emerald-100 hover:bg-white/10'
-                  }`}
+                {/* Faucet */}
+                <a
+                  href={GENLAYER_CONFIG.faucetUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm transition-colors"
                 >
-                  <span className="text-xl">{tab.icon}</span>
-                  <span className="text-xs">{tab.label}</span>
+                  <Droplets className="w-4 h-4" />
+                  <span className="hidden sm:inline">Faucet</span>
+                </a>
+
+                {/* Address & Status */}
+                <div className="flex items-center gap-2 px-3 py-2 bg-black/30 rounded-lg">
+                  <span className={`w-2 h-2 rounded-full ${isGenLayer ? 'bg-green-400' : 'bg-yellow-400'}`} />
+                  <span className="font-mono text-sm text-white">{shortAddress}</span>
+                </div>
+
+                {/* Disconnect */}
+                <button
+                  onClick={onDisconnect}
+                  className="px-3 py-2 bg-red-600/80 hover:bg-red-600 rounded-lg text-sm transition-colors"
+                >
+                  Disconnect
                 </button>
-              ))}
-            </nav>
+              </>
+            ) : (
+              <button
+                onClick={onConnect}
+                disabled={isConnecting}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-lg font-medium transition-colors"
+              >
+                <Wallet className="w-5 h-5" />
+                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+              </button>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </header>
   );

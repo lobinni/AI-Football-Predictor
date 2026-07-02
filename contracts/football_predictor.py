@@ -1,4 +1,9 @@
 # { "Depends": "py-genlayer:test" }
+# 
+# FootballPredictor Intelligent Contract
+# Deployed at: 0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D
+# Network: GenLayer Testnet Bradbury
+# Explorer: https://explorer-bradbury.genlayer.com/contract/0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D
 
 from genlayer import *
 import json
@@ -8,14 +13,14 @@ import typing
 class FootballPredictor(gl.Contract):
     """
     Intelligent Contract for AI-powered football match predictions.
-
+    
     This contract:
-    1. Fetches live data from BBC Sport and other sources
-    2. Uses LLM (gl.exec_prompt) to analyze and aggregate data
-    3. Stores predictions on-chain with Equivalence Principle consensus
-    4. Allows users to query prediction history
+    1. Fetches live data from BBC Sport via gl.get_webpage()
+    2. Uses LLM analysis via gl.exec_prompt()
+    3. Reaches validator consensus via gl.eq_principle_strict_eq()
+    4. Stores predictions permanently on-chain
     """
-
+    
     prediction_count: u32
     predictions: TreeMap[str, str]  # prediction_id -> JSON result
     user_predictions: TreeMap[str, str]  # address -> comma-separated prediction_ids
@@ -27,23 +32,25 @@ class FootballPredictor(gl.Contract):
 
     @gl.public.write
     def predict_match(
-        self, home_team: str, away_team: str, match_date: str
+        self,
+        home_team: str,
+        away_team: str,
+        match_date: str
     ) -> str:
         """
-        Analyze and predict a football match by aggregating
-        real-time web data and running AI analysis on-chain.
-
+        Analyze and predict a football match using on-chain AI.
+        
         Args:
             home_team: Name of the home team
             away_team: Name of the away team
             match_date: Date of the match (YYYY-MM-DD)
-
+            
         Returns:
             JSON string with prediction results
         """
-
+        
         def analyze() -> str:
-            # 1. Fetch data from BBC Sport
+            # 1. Fetch live data from BBC Sport
             bbc_url = (
                 "https://www.bbc.com/sport/football/scores-fixtures/"
                 + match_date
@@ -68,19 +75,20 @@ Respond ONLY with this exact JSON format, no other text:
     "home_win_prob": <number 0-100>,
     "draw_prob": <number 0-100>,
     "away_win_prob": <number 0-100>,
-    "predicted_score": "<home_goals>-<away_goals>",
-    "confidence": <number 1-10>,
-    "analysis": "<2-3 sentence analysis>"
+    "predicted_score": "<home_goals> - <away_goals>",
+    "confidence": <number 0-100>,
+    "analysis": "<brief analysis text>"
 }}
 """
-
             result = gl.exec_prompt(task)
+            
             # Clean any markdown formatting
             cleaned = (
                 result.replace("```json", "")
                 .replace("```", "")
                 .strip()
             )
+            
             # Validate JSON and normalize
             parsed = json.loads(cleaned)
             return json.dumps(parsed, sort_keys=True)
