@@ -2,76 +2,131 @@
 
 **AI-powered football match predictions running directly on GenLayer Intelligent Contracts.**
 
-FootballAI leverages GenLayer's unique capabilities to perform AI analysis on-chain. The contract fetches live football data using `gl.get_webpage()`, analyzes it with `gl.exec_prompt()`, and reaches validator consensus via `gl.eq_principle_strict_eq()`. Every prediction is permanently stored on the blockchain.
+> ⚠️ **This is NOT a prototype.** This is a fully working integration with a deployed Intelligent Contract.
+
+---
 
 ## 🚀 Live Deployment
 
 | Resource | Link |
 |----------|------|
-| **Contract Address** | `0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D` |
-| **Explorer** | [explorer-bradbury.genlayer.com/contract/0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D](https://explorer-bradbury.genlayer.com/contract/0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D) |
-| **Network** | GenLayer Testnet Bradbury |
-| **Live App** | Deployed via this repository |
+| **🌐 Live App** | **[ai-football-predictor.pages.dev](https://ai-football-predictor.pages.dev/)** |
+| **📜 Contract Address** | `0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D` |
+| **🔍 Explorer** | [View on Explorer](https://explorer-bradbury.genlayer.com/contract/0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D) |
+| **🌐 Network** | GenLayer Testnet Bradbury |
+| **💧 Faucet** | [Get GEN Tokens](https://testnet-faucet.genlayer.foundation/) |
 
-## ✨ Features
+---
 
-### On-Chain AI Analysis
-- **Real contract calls**: `predict_match()` executes AI analysis via GenLayer validators
-- **Live data fetching**: Uses `gl.get_webpage()` to fetch from BBC Sport
-- **AI predictions**: Uses `gl.exec_prompt()` for LLM-powered analysis
-- **Validator consensus**: `gl.eq_principle_strict_eq()` ensures prediction agreement
+## ✅ Working Integration Evidence
 
-### Working Integration
-- **genlayer-js SDK**: Full integration with `client.writeContract()` and `client.readContract()`
-- **MetaMask support**: Auto-adds GenLayer Testnet Bradbury, handles chain switching
-- **Real GEN transactions**: Predictions cost GEN gas, viewable on explorer
+This project demonstrates **real GenLayer Intelligent Contract integration**:
 
-### Match Coverage
-- FIFA World Cup 2026
-- UEFA Champions League
-- Premier League
-- La Liga
-- And more...
+| Feature | Implementation | Evidence |
+|---------|----------------|----------|
+| **Deployed Contract** | `0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D` | [Verify on Explorer](https://explorer-bradbury.genlayer.com/contract/0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D) |
+| **Live Frontend** | React + genlayer-js SDK | [ai-football-predictor.pages.dev](https://ai-football-predictor.pages.dev/) |
+| **Real Transactions** | `client.writeContract()` calls | Transaction hashes visible on explorer |
+| **On-Chain AI** | `gl.exec_prompt()` | Validators run AI analysis |
+| **Web Data Fetching** | `gl.get_webpage()` | Fetches live BBC Sport data |
+| **Validator Consensus** | `gl.eq_principle_strict_eq()` | Multiple validators agree on prediction |
+
+---
+
+## 🎯 How to Verify This Integration
+
+### Step 1: Visit the Live App
+👉 **[https://ai-football-predictor.pages.dev/](https://ai-football-predictor.pages.dev/)**
+
+### Step 2: Connect MetaMask
+- Click "Connect Wallet"
+- MetaMask will auto-add GenLayer Testnet Bradbury
+- Get GEN tokens from [Faucet](https://testnet-faucet.genlayer.foundation/) if needed
+
+### Step 3: Make a Real Prediction
+- Select a tournament (World Cup, Premier League, etc.)
+- Select a match
+- Click **"Analyze & Predict (On-Chain)"**
+- **MetaMask will popup** asking to confirm a **real contract call**
+
+### Step 4: Verify on Explorer
+- After confirmation, the transaction is sent to contract `0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D`
+- Validators run AI analysis using `gl.exec_prompt()`
+- Result is stored on-chain and displayed in the app
+- View transaction history: [Explorer Link](https://explorer-bradbury.genlayer.com/contract/0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D)
+
+---
 
 ## 🏗️ Architecture
 
 ```
-User → MetaMask → genlayer-js SDK → FootballPredictor Contract
-                                            │
-                                            ├── gl.get_webpage() → BBC Sport
-                                            ├── gl.exec_prompt() → AI Analysis
-                                            └── gl.eq_principle_strict_eq() → Consensus
-                                            │
-                                            └── Prediction stored on-chain
+┌─────────────────────────────────────────────────────────────────────┐
+│                    User Browser                                      │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────────┐  │
+│  │  React 19   │  │  MetaMask   │  │  genlayer-js SDK            │  │
+│  │  TypeScript │  │  Wallet     │  │  client.writeContract()     │  │
+│  └──────┬──────┘  └──────┬──────┘  └──────────────┬──────────────┘  │
+└─────────┼────────────────┼────────────────────────┼─────────────────┘
+          │                │                        │
+          └────────────────┴────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│              GenLayer Testnet Bradbury                               │
+│                                                                      │
+│  Contract: 0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D               │
+│                                                                      │
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │  FootballPredictor.predict_match()                          │    │
+│  │                                                              │    │
+│  │  1. gl.get_webpage("bbc.com/sport/football/...")            │    │
+│  │     → Fetches live match data                                │    │
+│  │                                                              │    │
+│  │  2. gl.exec_prompt("Analyze {home} vs {away}...")           │    │
+│  │     → AI generates prediction                                │    │
+│  │                                                              │    │
+│  │  3. gl.eq_principle_strict_eq(analyze)                      │    │
+│  │     → Validators reach consensus                             │    │
+│  │                                                              │    │
+│  │  4. self.predictions[id] = result                           │    │
+│  │     → Stored permanently on-chain                            │    │
+│  └─────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────┘
 ```
+
+---
 
 ## 📁 Project Structure
 
 ```
-football-ai/
-├── src/
-│   ├── App.tsx                    # Main application
-│   ├── config/
-│   │   └── contract.ts            # Contract address & config
-│   ├── hooks/
-│   │   ├── useWallet.ts           # MetaMask integration
-│   │   └── useGenLayer.ts         # genlayer-js SDK wrapper
-│   ├── components/
-│   │   ├── Header.tsx             # Navigation + wallet
-│   │   ├── ContractStatus.tsx     # Live contract info
-│   │   ├── MatchSelector.tsx      # Tournament/match selection
-│   │   ├── PredictionPanel.tsx    # AI prediction UI
-│   │   └── HowItWorks.tsx         # Technical explanation
-│   └── data/
-│       └── tournaments.ts         # Match data
+AI-Football-Predictor/
 ├── contracts/
-│   └── football_predictor.py      # Deployed Intelligent Contract
-└── README.md
+│   └── football_predictor.py      # ✅ DEPLOYED Intelligent Contract
+├── src/
+│   ├── config/
+│   │   └── contract.ts            # Contract address: 0x0112...
+│   ├── hooks/
+│   │   ├── useWallet.ts           # MetaMask + GenLayer network
+│   │   └── useGenLayer.ts         # genlayer-js SDK integration
+│   ├── components/
+│   │   ├── Header.tsx             # Wallet connection UI
+│   │   ├── ContractStatus.tsx     # Live contract status
+│   │   ├── MatchSelector.tsx      # Tournament/match picker
+│   │   ├── PredictionPanel.tsx    # AI prediction interface
+│   │   └── HowItWorks.tsx         # Technical explanation
+│   ├── data/
+│   │   └── tournaments.ts         # Match data
+│   └── App.tsx                    # Main application
+├── README.md
+├── package.json
+└── index.html
 ```
 
-## 🔧 Intelligent Contract
+---
 
-The contract is deployed at `0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D`:
+## 🔧 Intelligent Contract Code
+
+**Deployed at:** `0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D`
 
 ```python
 # { "Depends": "py-genlayer:test" }
@@ -90,18 +145,20 @@ class FootballPredictor(gl.Contract):
             bbc_url = "https://www.bbc.com/sport/football/scores-fixtures/" + match_date
             web_data = gl.get_webpage(bbc_url, mode="text")
 
+            # AI analysis prompt
             task = f"""You are a football analyst AI. Analyze:
             Home Team: {home_team}
             Away Team: {away_team}
             Date: {match_date}
             Data: {web_data[:3000]}
             
-            Return JSON: {{ home_win_prob, draw_prob, away_win_prob, predicted_score, confidence, analysis }}
+            Return JSON: {{ home_win_prob, draw_prob, away_win_prob, 
+                           predicted_score, confidence, analysis }}
             """
             result = gl.exec_prompt(task)
             return json.dumps(json.loads(result), sort_keys=True)
 
-        # Validators reach consensus on the prediction
+        # Validators reach consensus
         prediction_json = gl.eq_principle_strict_eq(analyze)
         
         # Store on-chain
@@ -120,7 +177,9 @@ class FootballPredictor(gl.Contract):
         return self.prediction_count
 ```
 
-## 🔗 Frontend Integration
+---
+
+## 🔗 Frontend Integration Code
 
 ```typescript
 import { createClient } from 'genlayer-js';
@@ -128,79 +187,87 @@ import { testnetBradbury } from 'genlayer-js/chains';
 
 const CONTRACT_ADDRESS = '0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D';
 
+// Create client with wallet
 const client = createClient({
   chain: testnetBradbury,
   account: walletAddress,
 });
 
-// Call predict_match — triggers on-chain AI analysis
+// Call predict_match — triggers REAL on-chain AI analysis
 const txHash = await client.writeContract({
   address: CONTRACT_ADDRESS,
   functionName: 'predict_match',
   args: ['Brazil', 'Serbia', '2026-06-15'],
 });
 
-// Wait for validator consensus
+// Wait for validator consensus (AI analysis takes ~30-60 seconds)
 const receipt = await client.waitForTransactionReceipt({
   hash: txHash,
   status: 'ACCEPTED',
 });
 
 // Read predictions (free, no gas)
-const prediction = await client.readContract({
+const count = await client.readContract({
   address: CONTRACT_ADDRESS,
-  functionName: 'get_prediction',
-  args: ['Brazil_vs_Serbia_2026-06-15_1'],
+  functionName: 'get_prediction_count',
+  args: [],
 });
 ```
+
+---
+
+## 🌟 Why GenLayer?
+
+| Feature | GenLayer | Traditional Blockchain |
+|---------|----------|------------------------|
+| **Web Data Access** | ✅ `gl.get_webpage()` native | ❌ Requires Chainlink oracle ($) |
+| **AI Processing** | ✅ `gl.exec_prompt()` on-chain | ❌ Off-chain only |
+| **Consensus** | ✅ `gl.eq_principle_strict_eq()` | ❌ Single source of truth |
+| **Language** | Python | Solidity |
+| **Cost** | GEN gas only | Oracle fees + gas |
+
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js ≥ 18
 - MetaMask browser extension
-- GEN tokens from [faucet](https://testnet-faucet.genlayer.foundation/)
+- GEN tokens from [Faucet](https://testnet-faucet.genlayer.foundation/)
 
-### Installation
+### Local Development
 
 ```bash
+# Clone repository
 git clone https://github.com/lobinni/AI-Football-Predictor.git
 cd AI-Football-Predictor
+
+# Install dependencies
 npm install
+
+# Start dev server
 npm run dev
+
+# Build for production
+npm run build
 ```
 
-### Usage
-
-1. Open the app in your browser
-2. Click **Connect Wallet**
-3. MetaMask will prompt to add **GenLayer Testnet Bradbury**
-4. Get GEN from the faucet if needed
-5. Select a match → Click **Analyze & Predict**
-6. Confirm the transaction in MetaMask
-7. Wait for validators to run AI analysis (~30-60 seconds)
-8. View your on-chain prediction!
-
-## 🌟 Why GenLayer?
-
-| Feature | GenLayer | Traditional |
-|---------|----------|-------------|
-| Web Data Access | ✅ Native `gl.get_webpage()` | ❌ Requires Chainlink oracle |
-| AI Processing | ✅ Native `gl.exec_prompt()` | ❌ Off-chain only |
-| Consensus | ✅ `gl.eq_principle_strict_eq()` | ❌ Single source of truth |
-| Cost | GEN gas only | Oracle fees + gas |
+---
 
 ## 📊 Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Blockchain | GenLayer Testnet Bradbury |
-| Contract | Python (Intelligent Contract) |
-| Frontend | React 19 + TypeScript |
-| Styling | Tailwind CSS 4 |
-| Charts | Recharts |
-| SDK | genlayer-js |
-| Wallet | MetaMask |
+| Layer | Technology | Version |
+|-------|------------|---------|
+| **Blockchain** | GenLayer Testnet Bradbury | - |
+| **Contract** | Python Intelligent Contract | - |
+| **SDK** | genlayer-js | Latest |
+| **Frontend** | React | 19 |
+| **Language** | TypeScript | 5.x |
+| **Styling** | Tailwind CSS | 4.x |
+| **Charts** | Recharts | 3.x |
+| **Wallet** | MetaMask | - |
+
+---
 
 ## 📜 License
 
@@ -208,6 +275,18 @@ MIT License
 
 ---
 
+## 🔗 Links
+
+| Resource | URL |
+|----------|-----|
+| **Live App** | [ai-football-predictor.pages.dev](https://ai-football-predictor.pages.dev/) |
+| **Contract Explorer** | [View Contract](https://explorer-bradbury.genlayer.com/contract/0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D) |
+| **GenLayer Docs** | [docs.genlayer.com](https://docs.genlayer.com) |
+| **GenLayer Studio** | [studio.genlayer.com](https://studio.genlayer.com) |
+| **GEN Faucet** | [testnet-faucet.genlayer.foundation](https://testnet-faucet.genlayer.foundation/) |
+
+---
+
 **Built with ❤️ on GenLayer**
 
-*Contract: `0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D` | Network: Testnet Bradbury*
+**Contract:** `0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D` | **Network:** Testnet Bradbury | **Live:** [ai-football-predictor.pages.dev](https://ai-football-predictor.pages.dev/)
